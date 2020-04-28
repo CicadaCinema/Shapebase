@@ -1,16 +1,27 @@
 pico-8 cartridge // http://www.pico-8.com
 version 21
 __lua__
-x = 64
-y = 64
-sprite = 1
-mode = 0
-col = 0
-cls()
-sel_spr = 1
-draw = {}
-drawnum = 0
-drawlen = 0
+
+function _init()
+ cls()
+
+	grid = {}
+
+	-- create empty 16x16 grid
+	for i=1,16 do
+		grid[#grid+1] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}
+ end
+
+	x = 64
+	y = 64
+	sprite = 1
+	mode = 0
+	col = 0
+	sel_spr = 1
+	draw = {}
+	drawnum = 0
+	drawlen = 0
+end
 
 function _update()
 	if mode == 0 then
@@ -131,6 +142,7 @@ function _draw()
 end
 end
 end
+
 __gfx__
 00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000033333333111111110000000000000000
 00000000000000000000088000088000000000000000000000000000000000000000000000000000088000000880000033333333111111110000000000000000
