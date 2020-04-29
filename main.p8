@@ -2,6 +2,13 @@ pico-8 cartridge // http://www.pico-8.com
 version 21
 __lua__
 
+-- add n troops to the grid
+function add_troops(n)
+	for i=1,n do
+		grid[cursor_pos[2]+1][cursor_pos[1]+1] = troops_spawn_dict[current_player][grid[cursor_pos[2]+1][cursor_pos[1]+1]]
+	end
+end
+
 function _init()
 	current_player = 1
 	-- action id (or 0 for action select menu), options for actions user could pick (action table)
@@ -34,6 +41,16 @@ function _init()
 		{2,1,3},
 		{2,3,1}
 	}
+
+	-- troops_spawn_dict[n][m] where n=player number, m=foreground sprite is the
+	-- sprite number to be displayed when 1 troop is spawned
+	troops_spawn_dict = {{},{}}
+	troops_spawn_dict[1][9] = 3
+	troops_spawn_dict[1][3] = 4
+	troops_spawn_dict[1][4] = 5
+	troops_spawn_dict[2][9] = 6
+	troops_spawn_dict[2][6] = 7
+	troops_spawn_dict[2][7] = 8
 
 	-- backdrop stores terrain (background)
 	backdrop = {
@@ -116,10 +133,21 @@ function _update()
 			current_action = {nil, {}}
 		-- if user has picked an action
 		elseif (btnp(4)) then
-			-- deduct player points
-			player_points[current_player] -= current_action[2][action_cursor_pos][2]
+			chosen_action = current_action[2][action_cursor_pos]
 
-			-- BIG ACTION IF STATEMENT GOES HERE
+			-- deduct player points
+			player_points[current_player] -= chosen_action[2]
+
+			-- BIG ACTION IF STATEMENT GOES HERE (SEE BELOW)
+
+			-- use troops spawn dict to add appropriate numbers of troops
+			if (chosen_action[1]=="spawn 1 troop") do
+				add_troops(1)
+			elseif (chosen_action[1]=="spawn 2 troops") then
+				add_troops(2)
+			elseif (chosen_action[1]=="spawn 3 troops") then
+				add_troops(3)
+			end
 
 			-- go back to map screen
 			current_action = {nil, {}}
