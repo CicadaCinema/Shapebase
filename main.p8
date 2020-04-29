@@ -153,6 +153,10 @@ function _draw()
 
 		-- display current player
 		print("P"..current_player, 121, 22, 7)
+
+		-- display controls
+		print("z - perform action", 1, 116)
+		print("x - [not implemented]", 1, 123)
 	-- if on menu screen
 	else
 		-- display list of possible actions
@@ -162,6 +166,10 @@ function _draw()
 
 		-- display action cursor
 		print(">", 10, 7*action_cursor_pos, 7)
+
+		-- display controls
+		print("z - perform this action", 1, 116)
+		print("x - go back", 1, 123)
 	end
 end
 
