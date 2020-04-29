@@ -97,7 +97,9 @@ function _update()
 	if (current_action[1] == nil) then
 		-- if user wants to enter menu screen
 		if (btnp(4)) then
+			action_cursor_pos = 1
 			current_action[1] = 0
+
 			-- find current foreground sprite to retrieve list of actions
 			current_foreground_sprite = grid[cursor_pos[2]+1][cursor_pos[1]+1]
 			-- find current territory (home, no man's land, away)
