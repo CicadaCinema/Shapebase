@@ -10,18 +10,24 @@ function _init()
 
 	directions = {"North, South", "East", "West"}
 
-	-- actions for each of the foreground sprites, their cost and options
-	actions = {{},{},{},{},{},{},{},{},
-		{
-			{"move 1 troop", 1, directions}
-		}
-	}
+	-- action data, cost and parameters
+	-- actions are located according to the foreground-background sprite combination they can be used in
+	-- actions[n][m] - n = territory (home, no man's land, enemy), m = foreground sprite
+	actions = {{},{},{}}
+	-- double brackets used because this is actually a list of actions for those criteria
+	actions[1][9] = {{"spawn 1 troop", 1}}
 
 		-- player points are stored as one array
 	player_points = {44,44}
 
 	-- (x,y) position of the cursor - ranges from 0 to 15
 	cursor_pos = {0,0}
+
+	-- converts absolute player number and background sprite id into one of {home, no man's land, enemy}
+	territory_dict = {
+		{2,1,3},
+		{2,3,1}
+	}
 
 	-- backdrop stores terrain (background)
 	backdrop = {
@@ -71,10 +77,15 @@ function _update()
 			current_action[1] = 0
 			-- find current foreground sprite to retrieve list of actions
 			current_foreground_sprite = grid[cursor_pos[2]+1][cursor_pos[1]+1]
+			-- find current territory (home, no man's land, away)
+			-- must add one to the value retrieved from backdrop because need to go from {0,1,2} to {1,2,3}
+			current_territory = territory_dict[current_player][backdrop[cursor_pos[2]+1][cursor_pos[1]+1]+1]
+
+			available_actions = actions[current_territory][current_foreground_sprite]
 
 			-- fill list of possible actions
-			for i=1,#actions[current_foreground_sprite] do
-				current_action[2][i] = actions[current_foreground_sprite][i][1]
+			for i=1,#available_actions do
+				current_action[2][i] = available_actions[i][1]
 			end
 		-- if user is interacting with map screen
 		else
