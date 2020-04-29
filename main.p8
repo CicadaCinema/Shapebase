@@ -17,6 +17,8 @@ function _init()
 	-- double brackets used because this is actually a list of actions for those criteria
 	actions[1][9] = {{"spawn 1 troop", 1}}
 
+	no_action = {"no action available", 0}
+
 		-- player points are stored as one array
 	player_points = {44,44}
 
@@ -81,7 +83,9 @@ function _update()
 			-- must add one to the value retrieved from backdrop because need to go from {0,1,2} to {1,2,3}
 			current_territory = territory_dict[current_player][backdrop[cursor_pos[2]+1][cursor_pos[1]+1]+1]
 
+			-- retrieve available actions; if none are available, insert placeholder action anyway
 			available_actions = actions[current_territory][current_foreground_sprite]
+			if (available_actions==nil) available_actions = {no_action}
 
 			-- fill list of possible actions
 			for i=1,#available_actions do
