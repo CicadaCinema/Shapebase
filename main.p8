@@ -4,6 +4,18 @@ __lua__
 
 function _init()
 	current_player = 1
+	-- action id (or 0 for action select menu), options
+	current_action = {nil, {}}
+	action_cursor_pos = 1
+
+	directions = {"North, South", "East", "West"}
+
+	-- actions for each of the foreground sprites, their cost and options
+	actions = {{},{},{},{},{},{},{},{},
+		{
+			{"move 1 troop", 1, directions}
+		}
+	}
 
 		-- player points are stored as one array
 	player_points = {44,44}
@@ -52,172 +64,86 @@ function _init()
 end
 
 function _update()
-	-- move cursor according to button inputs
-	if (btnp(0)) cursor_pos[1] -= 1
-	if (btnp(1)) cursor_pos[1] += 1
-	if (btnp(2)) cursor_pos[2] -= 1
-	if (btnp(3)) cursor_pos[2] += 1
-
-	-- restrict cursor to grid
-	for i=1,2 do
-		if (cursor_pos[i]<0) cursor_pos[i]=0
-		if (cursor_pos[i]>15) cursor_pos[i]=15
-	end
-
-	-- place test sprites (temp)
-	if (btnp(4)) grid[cursor_pos[2]+1][cursor_pos[1]+1] = 5
-	if (btnp(5)) grid[cursor_pos[2]+1][cursor_pos[1]+1] = 8
-
-	--[[
-	if mode == 0 then
-		if (btnp(0) and x > 0) x -= 8
-		if (btnp(1) and x < 120) x += 8
-		if (btnp(2) and y > 0) y -= 8
-		if (btnp(3) and y < 120) y += 8
-		if (btnp(4)) mode = 1
-		if (btnp(5)) sel_spr = sprite
-		if (btnp(5)) draw[drawnum] = sel_spr
-		if (btnp(5)) drawnum += 1
-		if (btnp(5)) draw[drawnum] = x
-		if (btnp(5)) drawnum += 1
-		if (btnp(5)) draw[drawnum] = y
-		if (btnp(5)) drawnum += 1
-		if (btnp(5)) drawlen += 3
-	elseif mode == 1 then
-		if (btnp(1)) sprite += 1
-		if (btnp(0)) sprite -= 1
-		if (btnp(4)) mode = 2
-		if (btnp(5)) mode = 0
-	elseif mode == 2 then
-		if (btnp(2)) col += 1
-		if (btnp(3)) col -= 1
-		if (btnp(4)) mode = 3
-		if (btnp(5)) mode = 1
-	elseif mode == 3 then
-		if (btnp(0) and x > 0) x -= 8
-		if (btnp(1) and x < 120) x += 8
-		if (btnp(2) and y > 0) y -= 8
-		if (btnp(3) and y < 120) y += 8
+	-- if on map screen
+	if (current_action[1] == nil) then
+		-- if user wants to enter menu screen
 		if (btnp(4)) then
-			if y == start_ranx and x == start_rany then
-				sprite = 192
-			elseif y == start_ranx and x == islandy then
-			 sprite = 193
-			elseif y == islandx and x == islandy then
-			 sprite = 194
-			elseif y == islandx and x == start_rany then
-			 sprite = 195
-			elseif y == start_ranx then
-			 sprite = 201
-			elseif x == islandy then
-			 sprite = 202
-			elseif y == islandx then
-			 sprite = 203
-			elseif x == start_rany then
-			 sprite = 204
-		if (btnp(4)) sel_spr = sprite
-		if (btnp(4)) draw[drawnum] = sel_spr
-		if (btnp(4)) drawnum += 1
-		if (btnp(4)) draw[drawnum] = x
-		if (btnp(4)) drawnum += 1
-		if (btnp(4)) draw[drawnum] = y
-		if (btnp(4)) drawnum += 1
-		if (btnp(4)) drawlen += 3
+			current_action[1] = 0
+			-- find current foreground sprite to retrieve list of actions
+			current_foreground_sprite = grid[cursor_pos[2]+1][cursor_pos[1]+1]
+
+			-- fill list of possible actions
+			for i=1,#actions[current_foreground_sprite] do
+				current_action[2][i] = actions[current_foreground_sprite][i][1]
+			end
+		-- if user is interacting with map screen
+		else
+			-- move cursor according to button inputs
+			if (btnp(0)) cursor_pos[1] -= 1
+			if (btnp(1)) cursor_pos[1] += 1
+			if (btnp(2)) cursor_pos[2] -= 1
+			if (btnp(3)) cursor_pos[2] += 1
+
+			-- restrict cursor to grid
+			for i=1,2 do
+				if (cursor_pos[i]<0) cursor_pos[i]=0
+				if (cursor_pos[i]>15) cursor_pos[i]=15
+			end
 		end
-	 end
-		if (btnp(5)) mode = 2
-	elseif mode == 4 then
-		if (btnp(2)) spr(0, x, y)
-		if (btnp(4)) mode = 5
-	elseif mode == 5 then
-	 if (btnp(2)) mode = mode
-	 if (btnp(4)) mode = 0
+	-- if on menu screen
+	else
+		-- if user wants to enter map screen
+		if (btnp(5)) then
+			current_action[1] = nil
+		-- if user is interacting with menu screen
+		else
+			-- change action cursor position
+			if (btnp(2)) action_cursor_pos -= 1
+			if (btnp(3)) action_cursor_pos += 1
+		end
 	end
-	end
-
-	islandx = flr(rnd(4))
-	islandx += 10
-	islandy = islandx + flr(rnd(3))
-	start_ranx = flr(rnd(3)) +1
-	start_rany = flr(rnd(3)) +1
-
-	i = 0
-	j = 0
-	--]]
 end
-
 
 function _draw()
 	cls()
 
-	-- draw backdrop
-	for y=1,16 do
-		for x=1,16 do
-			-- fetch the sprite id from the grid array and draw it
-			-- ensure the first sprite is drawn at (0,0)
-			spr(backdrop[y][x], 7*x-6, 7*y-6)
-		end
-	end
-
-	-- draw game objects
-	for y=1,16 do
-		for x=1,16 do
-			spr(grid[y][x], 7*x-6, 7*y-6)
-		end
-	end
-
-	-- draw cursor sprite
-	spr(64, cursor_pos[1]*7, cursor_pos[2]*7)
-
-	-- display player points
-	print(player_points[1], 121, 1, 8)
-	print(player_points[2], 121, 8, 10)
-
-	-- display current player
-	print("P"..current_player, 121, 22, 7)
-
-	--[[
-	for i=0,16 do
-		for j=0,16 do
-			spr(213, i*8, j*8)
-		end
-	end
-	i=0
-	j=0
-	for i=start_rany,islandy do
-		for j=start_ranx,islandx do
-			if j == start_ranx and i == start_rany then
-				spr(192, i*8, j*8)
-			elseif j == start_ranx and i == islandy then
-			 spr(193, i*8, j*8)
-			elseif j == islandx and i == islandy then
-			 spr(194, i*8, j*8)
-			elseif j == islandx and i == start_rany then
-				spr(195, i*8, j*8)
-			elseif j == start_ranx then
-				spr(201, i*8, j*8)
-			elseif i == islandy then
-				spr(202, i*8, j*8)
-			elseif j == islandx then
-				spr(203, i*8, j*8)
-			elseif i == start_rany then
-				spr(204, i*8, j*8)
-			elseif i>start_rany then
-				spr(200, i*8, j*8)
+	-- if on map screen
+	if (current_action[1] == nil) then
+		-- draw backdrop
+		for y=1,16 do
+			for x=1,16 do
+				-- fetch the sprite id from the grid array and draw it
+				-- ensure the first sprite is drawn at (0,0)
+				spr(backdrop[y][x], 7*x-6, 7*y-6)
+			end
 		end
 
-	for i=0,(drawlen) do
-		spr(draw[3*i],draw[3*i+1],draw[3*i+2])
-	end
+		-- draw game objects
+		for y=1,16 do
+			for x=1,16 do
+				spr(grid[y][x], 7*x-6, 7*y-6)
+			end
+		end
 
-	spr(0, x, y)
-	spr(0, x-8, y)
-	spr(sprite, x, y)
-	spr(128+mode, x-8, y)
-	end
-	end
-	--]]
+		-- draw cursor sprite
+		spr(64, cursor_pos[1]*7, cursor_pos[2]*7)
 
+		-- display player points
+		print(player_points[1], 121, 1, 8)
+		print(player_points[2], 121, 8, 10)
+
+		-- display current player
+		print("P"..current_player, 121, 22, 7)
+	-- if on menu screen
+	else
+		-- display list of possible actions
+		for i=1,#current_action[2] do
+			print(current_action[2][i], 20, 7*i, 7)
+		end
+
+		-- display action cursor
+		print(">", 10, 7*action_cursor_pos, 7)
+	end
 end
 
 __gfx__
