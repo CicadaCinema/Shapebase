@@ -4,7 +4,7 @@ __lua__
 
 function _init()
 	current_player = 1
-	-- action id (or 0 for action select menu), options
+	-- action id (or 0 for action select menu), options for actions user could pick (action table)
 	current_action = {nil, {}}
 	action_cursor_pos = 1
 
@@ -15,7 +15,11 @@ function _init()
 	-- actions[n][m] - n = territory (home, no man's land, enemy), m = foreground sprite
 	actions = {{},{},{}}
 	-- double brackets used because this is actually a list of actions for those criteria
-	actions[1][9] = {{"spawn 1 troop", 1}}
+	actions[1][9] = {
+		{"spawn 1 troop", 1},
+		{"spawn 2 troops", 2},
+		{"spawn 3 troops", 3}
+	}
 
 	no_action = {"no action available", 0}
 
@@ -89,7 +93,7 @@ function _update()
 
 			-- fill list of possible actions
 			for i=1,#available_actions do
-				current_action[2][i] = available_actions[i][1]
+				current_action[2][i] = available_actions[i]
 			end
 		-- if user is interacting with map screen
 		else
@@ -109,8 +113,18 @@ function _update()
 	else
 		-- if user wants to enter map screen
 		if (btnp(5)) then
-			current_action[1] = nil
-		-- if user is interacting with menu screen
+			current_action = {nil, {}}
+		-- if user has picked an action
+		elseif (btnp(4)) then
+			-- deduct player points
+			player_points[current_player] -= current_action[2][action_cursor_pos][2]
+
+			-- BIG ACTION IF STATEMENT GOES HERE
+
+			-- go back to map screen
+			current_action = {nil, {}}
+
+		-- if user is choosing an action
 		else
 			-- change action cursor position
 			if (btnp(2)) action_cursor_pos -= 1
@@ -161,7 +175,7 @@ function _draw()
 	else
 		-- display list of possible actions
 		for i=1,#current_action[2] do
-			print(current_action[2][i], 20, 7*i, 7)
+			print(current_action[2][i][1], 20, 7*i, 7)
 		end
 
 		-- display action cursor
