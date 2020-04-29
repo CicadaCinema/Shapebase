@@ -100,6 +100,10 @@ function _update()
 			-- change action cursor position
 			if (btnp(2)) action_cursor_pos -= 1
 			if (btnp(3)) action_cursor_pos += 1
+
+			-- restrict action cursor to available options
+			if (action_cursor_pos<1) action_cursor_pos = 1
+			if (action_cursor_pos>#current_action[2]) action_cursor_pos = #current_action[2]
 		end
 	end
 end
