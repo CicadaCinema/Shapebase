@@ -75,8 +75,10 @@ function _init()
 	-- grid stores game objects
 	grid = {}
 	-- create empty 16x16 grid
-	for i=1,16 do
-		grid[#grid+1] = {9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9}
+	for y=1,16 do
+		for x=1,16 do
+			grid[y][x] = 9
+		end
 	end
 
 	--[[
