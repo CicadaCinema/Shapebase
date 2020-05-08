@@ -76,22 +76,11 @@ function _init()
 	grid = {}
 	-- create empty 16x16 grid
 	for y=1,16 do
+		grid[y] = {}
 		for x=1,16 do
 			grid[y][x] = 9
 		end
 	end
-
-	--[[
-	x = 64
-	y = 64
-	sprite = 1
-	mode = 0
-	col = 0
-	sel_spr = 1
-	draw = {}
-	drawnum = 0
-	drawlen = 0
-	--]]
 end
 
 function _update()
