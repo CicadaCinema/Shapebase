@@ -76,9 +76,9 @@ function _init()
 	grid = {}
 	-- create empty 16x16 grid
 	for y=1,16 do
-		grid[y] = {}
+		add(grid, {})
 		for x=1,16 do
-			grid[y][x] = 9
+			add(grid[y], 9)
 		end
 	end
 end
